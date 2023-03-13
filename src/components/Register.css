@@ -8,6 +8,9 @@
   justify-content: center;
   align-items: center;
   height: 70vh;
+  justify-content: flex-end;
+  min-width:768px;
+  height:100%;
 }
 
 .form {
