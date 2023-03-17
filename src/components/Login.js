@@ -11,25 +11,11 @@ import "./Login.css";
 
 const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [formData,setFormData]=useState({
-    username:"",
-    password:""
-  });
-  const [loading,setLoading]=useState(false);
-  const handleChange=(event)=>
-  {
-    setFormData({...formData,[event.target.name]:event.target.value});
-  };
-  const handleSubmit=async(event)=>
-  {
-    event.preventDefault();
-    if(validateInput(formData))
-    {
-      setLoading(true);
-      login(formData);
-      setLoading(false);
-    }
-  };
+  const [username,setusername] = useState("");
+  const [password,setpassword] = useState("");
+  const [loading,setloading] = useState(false);
+  const history = useHistory();
+
   // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
   /**
    * Perform the Login API call
@@ -55,35 +41,37 @@ const Login = () => {
    * }
    *
    */
-   const login = async (formData) => {
-
-    const newobject ={
-      username:formData.username,
-      password:formData.password
-    };
-    try
+  const login = async (formData) => {
+    let isvalid = validateInput(formData)
+    if(!isvalid)
     {
-      const response=await axios.post(`${config.endpoint}/auth/login`,newobject);
-      if(response.data.success)
-      {
-        const {token,username,balance}=response.data;
-        persistLogin(token,username,balance);
-        enqueueSnackbar("Registration successful",{variant:"success"});
+      return false;
+    }
+    try
+    
+    {
+      setloading(true);
+      let response = await axios.post(`${config.endpoint}/auth/login`,formData);
+      
+      setloading(false);
+      if(response.status === 201){
+        persistLogin(response.data.token,response.data.username,response.data.balance);
+        enqueueSnackbar("Logged in successfully",{variant:'success'});
+        history.push("/");
+        
       }
     }
-    catch(error)
-    {
-      if(error.response && error.response.data && error.response.data.message)
+    catch(error){
+      setloading(false);
+      if(error.response && error.response.status === 400)
       {
-        enqueueSnackbar(error.response.data.message,{variant:"error"});
-      } 
-      else
-      {
-        enqueueSnackbar("Username is already taken",{variant:"error"});
+        enqueueSnackbar("Password is incorrect",{variant:"error"});
+      }
+      else{
+        enqueueSnackbar( "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",{variant:"error"});
       }
     }
   };
-   
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Validate the input
   /**
@@ -101,16 +89,21 @@ const Login = () => {
    * -    Check that password field is not an empty value - "Password is a required field"
    */
   const validateInput = (data) => {
-      if (!data.username) {
-        enqueueSnackbar("Username is a required field", { variant: "error" });
-        return false;
-      }
-      else if(!data.password) {
-        enqueueSnackbar("Password is a required field", { variant: "error" });
-        return false;
-      }
-  
+    let userLen = data.username.length;
+    let passLen = data.password.length;
+    if(userLen<1)
+    {
+      enqueueSnackbar("Username is a required field",{variant:"error"})
+      return false
+    }
+    else if(passLen<1){
+    enqueueSnackbar("Password is a required field",{variant:"error"});
+    return false;
+    }
+    else
+    {
       return true;
+    }
   };
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
@@ -130,10 +123,28 @@ const Login = () => {
    * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
    */
   const persistLogin = (token, username, balance) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("username", username);
-    localStorage.setItem("balance", balance);
+    localStorage.setItem("username",username);
+    localStorage.setItem("token",token);
+    localStorage.setItem("balance",balance);
   };
+
+  function handleUservalue(event)
+  {
+    setusername(event.target.value);
+  }
+
+  function handlePassword(event)
+  {
+    setpassword(event.target.value)
+  }
+  function dummy()
+  {
+    let obj = {
+      username:username,
+      password:password
+    }
+    login(obj);
+  }
 
   return (
     <Box
@@ -145,6 +156,41 @@ const Login = () => {
       <Header hasHiddenAuthButtons />
       <Box className="content">
         <Stack spacing={2} className="form">
+        <h2 className="title">Login</h2>
+          <TextField
+            id="username"
+            label="Username"
+            variant="outlined"
+            title="Username"
+            name="username"
+            placeholder="Enter Username"
+            fullWidth
+            onChange={handleUservalue}
+
+          />
+          <TextField
+            id="password"
+            variant="outlined"
+            label="Password"
+            name="password"
+            type="password"
+            // helperText="Password must be atleast 6 characters length"
+            fullWidth
+            placeholder="Enter a password with minimum 6 characters"
+            onChange={handlePassword}
+            />
+           <div style={{display:"flex",justifyContent:"center"}}>
+          {loading?<CircularProgress />
+           :<Button className="button" variant="contained" onClick={dummy}>
+            LOGIN TO QKART
+           </Button>}
+           </div>
+           <p className="secondary-action">
+            Already have an account?{" "}
+             <Link to="/register" className="link">
+              Register now
+             </Link>
+          </p>
         </Stack>
       </Box>
       <Footer />

@@ -16,16 +16,18 @@ function App() {
   return (
     <div className="App">
           <Switch>
+            
           
           <ThemeProvider theme={theme}>
-            <Route path="/register">
+            <Route exact path="/register">
               <Register />
             </Route>
-            <Route path="/login">
+
+            <Route exact path="/login">
               <Login />
             </Route>
 
-            <Route path="/">
+            <Route exact path="/">
               <Products />
             </Route>
 
