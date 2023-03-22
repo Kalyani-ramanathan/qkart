@@ -145,7 +145,7 @@ const ItemQuantity = ({ value, handleAdd, handleDelete}) => {
  *
  *
  */
-const Cart = ({ products, items = [], handleQuantity }) => {
+const Cart = ({ products, items = [], handleQuantity ,isReadOnly}) => {
   const history = useHistory();
 
   if (!items.length) {
@@ -204,12 +204,15 @@ const Cart = ({ products, items = [], handleQuantity }) => {
                   alignItems="center"
                 >
                   
+                  {!isReadOnly?
                   <ItemQuantity
                   // Add required props by checking implementation
                   value={product.qty}  
                   handleAdd={()=>handleAdd(product.productId,product.qty+1)}
                   handleDelete={()=>handleDelete(product.productId,product.qty-1)}
-                  />
+                  />:
+                  <Box>Qty:{product.qty}</Box>}
+
                   
                   <Box padding="0.5rem" fontWeight="700">
                   ${product.cost}

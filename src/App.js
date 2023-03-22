@@ -5,6 +5,8 @@ import Products from "./components/Products";
 import theme from "./theme";
 import {Route,Switch,Link} from "react-router-dom";
 import {ThemeProvider} from "@emotion/react";
+import Checkout from "./components/Checkout";
+import Thanks from "./components/Thanks";
 
 export const config = {
   endpoint: `http://${ipConfig.workspaceIp}:8082/api/v1`,
@@ -23,6 +25,14 @@ function App() {
 
             <Route exact path="/login">
               <Login />
+            </Route>
+
+            <Route exact path="/checkout">
+              <Checkout />
+            </Route>
+
+            <Route exact path="/thanks">
+              <Thanks />
             </Route>
 
             <Route exact path="/">
