@@ -6,8 +6,6 @@ import theme from "./theme";
 import {Route,Switch,Link} from "react-router-dom";
 import {ThemeProvider} from "@emotion/react";
 
-
-
 export const config = {
   endpoint: `http://${ipConfig.workspaceIp}:8082/api/v1`,
 };
